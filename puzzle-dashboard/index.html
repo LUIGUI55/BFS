@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BFS Linear Puzzle Solver</title>
+    
+    <!-- Link to Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="background-mesh"></div>
+    <div class="dashboard-container">
+        
+        <header>
+            <h1>Puzzle Lineal <span>BFS</span></h1>
+            <p>Resuelve el puzzle paso a paso usando Búsqueda en Amplitud.</p>
+        </header>
+        
+        <main class="glass-card">
+            
+            <section class="controls">
+                <div class="input-group">
+                    <label>Estado Inicial (Ej: 4,2,3,1)</label>
+                    <input type="text" id="initial-state" value="4,2,3,1" placeholder="Ej: 4,2,3,1">
+                </div>
+                
+                <div class="icon-arrow">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                </div>
+                
+                <div class="input-group">
+                    <label>Solución Meta (Ej: 1,2,3,4)</label>
+                    <input type="text" id="goal-state" value="1,2,3,4" placeholder="Ej: 1,2,3,4">
+                </div>
+            </section>
+            
+            <div class="action-bar">
+                <button id="solve-btn" class="primary-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    Encontrar Solución
+                </button>
+            </div>
+            
+            <section class="results-viewer">
+                <div class="results-header">
+                    <h2>Ruta Encontrada <span id="step-count" class="badge">0 Pasos</span></h2>
+                </div>
+                <div id="alert-message" class="alert hidden"></div>
+                <div id="path-container" class="path-container">
+                    <!-- Steps will be dynamically injected here -->
+                    <div class="placeholder-text">Presiona "Encontrar Solución" para comenzar...</div>
+                </div>
+            </section>
+        </main>
+        
+        <footer>
+            <p>Construido usando Búsqueda en Amplitud (BFS) para Netlify.</p>
+        </footer>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
