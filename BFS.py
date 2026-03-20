@@ -1,19 +1,18 @@
 from arbol import Nodo
 
-def operador_izquierdo(estado):
-    nuevo_estado = estado.copy()
-    nuevo_estado[0], nuevo_estado[1] = nuevo_estado[1], nuevo_estado[0]
-    return nuevo_estado
-
-def operador_central(estado):
-    nuevo_estado = estado.copy()
-    nuevo_estado[1], nuevo_estado[2] = nuevo_estado[2], nuevo_estado[1]
-    return nuevo_estado
-
-def operador_derecho(estado):
-    nuevo_estado = estado.copy()
-    nuevo_estado[2], nuevo_estado[3] = nuevo_estado[3], nuevo_estado[2]
-    return nuevo_estado
+# Graph definition based on Mexican cities requested
+conexiones = {
+    'CDMX': {'MORELOS', 'HIDALGO', 'QUERETARO', 'JILOTEPEC'},
+    'JILOTEPEC': {'CDMX', 'HIDALGO', 'QUERETARO'},
+    'HIDALGO': {'CDMX', 'JILOTEPEC', 'SLP', 'QUERETARO', 'TAMAULIPAS'},
+    'QUERETARO': {'CDMX', 'JILOTEPEC', 'HIDALGO', 'SLP', 'GDL'},
+    'MORELOS': {'CDMX'},
+    'SLP': {'HIDALGO', 'QUERETARO', 'ZACATECAS', 'MONTERREY', 'TAMAULIPAS'},
+    'ZACATECAS': {'SLP', 'GDL', 'MONTERREY'},
+    'GDL': {'QUERETARO', 'ZACATECAS'},
+    'MONTERREY': {'SLP', 'ZACATECAS', 'TAMAULIPAS'},
+    'TAMAULIPAS': {'SLP', 'MONTERREY', 'HIDALGO'}
+}
 
 def buscar_solucion_BFS(estado_inicial, solucion):
     solucionado = False
@@ -22,37 +21,41 @@ def buscar_solucion_BFS(estado_inicial, solucion):
     nodoInicial = Nodo(estado_inicial)
     nodos_frontera.append(nodoInicial)
 
+    # Check if solving for same node
+    if estado_inicial == solucion:
+        return nodoInicial
+
     while not solucionado and len(nodos_frontera) != 0:
         nodo = nodos_frontera.pop(0)
         nodos_visitados.append(nodo)
         
-        if nodo.get_datos() == solucion:
-            solucionado = True
-            return nodo
+        dato_nodo = nodo.get_datos()
+        
+        if dato_nodo in conexiones:
+            hijos_datos = conexiones[dato_nodo]
         else:
-            dato_nodo = nodo.get_datos()
-
-            hijos_datos = [
-                operador_izquierdo(dato_nodo),
-                operador_central(dato_nodo),
-                operador_derecho(dato_nodo)
-            ]
+            hijos_datos = []
             
-            for un_hijo in hijos_datos:
-                hijo = Nodo(un_hijo, padre=nodo) 
-                if not hijo.en_lista(nodos_visitados) and not hijo.en_lista(nodos_frontera):
-                    nodos_frontera.append(hijo)
+        for un_hijo in hijos_datos:
+            hijo = Nodo(un_hijo, padre=nodo)
+            
+            # Verify if not visited
+            # Optimize: check if already in list to avoid duplicates
+            if not hijo.en_lista(nodos_visitados) and not hijo.en_lista(nodos_frontera):
+                if un_hijo == solucion:
+                    solucionado = True
+                    return hijo
+                nodos_frontera.append(hijo)
+                
     return None
 
 if __name__ == "__main__":
-
-    estado_inicial = [4, 2, 3, 1]
-    solucion = [1, 2, 3, 4]
+    estado_inicial = 'CDMX'
+    solucion = 'MONTERREY'
     
     print(f"Buscando solucion para ir de {estado_inicial} a {solucion}...")
     nodo_solucion = buscar_solucion_BFS(estado_inicial, solucion)
 
-    # Mostrar resultado
     if nodo_solucion:
         resultado = []
         nodo = nodo_solucion
@@ -61,7 +64,6 @@ if __name__ == "__main__":
             nodo = nodo.get_padre()
         resultado.reverse()
         print("Ruta encontrada:")
-        for paso in resultado:
-            print(paso)
+        print(" -> ".join(resultado))
     else:
         print("No se encontró solución.")
