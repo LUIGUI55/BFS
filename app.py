@@ -23,11 +23,12 @@ def solve():
     if nodo_solucion:
         resultado = []
         nodo = nodo_solucion
+        costo_total = nodo.costo
         while nodo is not None: 
             resultado.append(nodo.get_datos())
             nodo = nodo.get_padre()
         resultado.reverse()
-        return jsonify({'path': resultado, 'success': True})
+        return jsonify({'path': resultado, 'cost': costo_total, 'success': True})
     else:
         return jsonify({'error': 'No se encontró solución de ruta', 'success': False})
 

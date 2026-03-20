@@ -97,22 +97,33 @@
 
                 if (data.success) {
                     resultContainer.classList.remove('hidden');
+                    
+                    const costBadge = document.createElement('div');
+                    costBadge.innerHTML = `<p style="margin-bottom: 1rem; color: #a5b4fc; font-weight: bold; text-align: center;">Peso / Costo Total: <span style="background:var(--primary-color); padding: 5px 10px; border-radius:12px; color:#fff;">${data.cost}</span></p>`;
+                    pathResult.appendChild(costBadge);
+
+                    const nodesDiv = document.createElement('div');
+                    nodesDiv.style.display = 'flex';
+                    nodesDiv.style.justifyContent = 'center';
+                    nodesDiv.style.flexWrap = 'wrap';
+
                     data.path.forEach((city, index) => {
                         const cityNode = document.createElement('div');
                         cityNode.className = 'city-node';
                         cityNode.innerHTML = `<span>${index + 1}</span><p>${city}</p>`;
                         cityNode.style.animationDelay = `${index * 0.15}s`;
-
-                        pathResult.appendChild(cityNode);
-
+                        
+                        nodesDiv.appendChild(cityNode);
+                        
                         if (index < data.path.length - 1) {
                             const arrow = document.createElement('div');
                             arrow.className = 'path-arrow';
                             arrow.innerHTML = '&#8594;';
                             arrow.style.animationDelay = `${index * 0.15 + 0.1}s`;
-                            pathResult.appendChild(arrow);
+                            nodesDiv.appendChild(arrow);
                         }
                     });
+                    pathResult.appendChild(nodesDiv);
                 } else {
                     errorContainer.classList.remove('hidden');
                     errorText.textContent = data.error || 'Ocurrió un error al buscar la ruta.';

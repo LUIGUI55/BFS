@@ -1,51 +1,69 @@
 from arbol import Nodo
 
-# Graph definition based on Mexican cities requested
+# Grafo ponderado con las ciudades de México solicitadas (distancias relativas en KM o Costos)
 conexiones = {
-    'CDMX': {'MORELOS', 'HIDALGO', 'QUERETARO', 'JILOTEPEC'},
-    'JILOTEPEC': {'CDMX', 'HIDALGO', 'QUERETARO'},
-    'HIDALGO': {'CDMX', 'JILOTEPEC', 'SLP', 'QUERETARO', 'TAMAULIPAS'},
-    'QUERETARO': {'CDMX', 'JILOTEPEC', 'HIDALGO', 'SLP', 'GDL'},
-    'MORELOS': {'CDMX'},
-    'SLP': {'HIDALGO', 'QUERETARO', 'ZACATECAS', 'MONTERREY', 'TAMAULIPAS'},
-    'ZACATECAS': {'SLP', 'GDL', 'MONTERREY'},
-    'GDL': {'QUERETARO', 'ZACATECAS'},
-    'MONTERREY': {'SLP', 'ZACATECAS', 'TAMAULIPAS'},
-    'TAMAULIPAS': {'SLP', 'MONTERREY', 'HIDALGO'}
+    'CDMX': {'MORELOS': 85, 'HIDALGO': 90, 'QUERETARO': 210, 'JILOTEPEC': 100},
+    'JILOTEPEC': {'CDMX': 100, 'HIDALGO': 80, 'QUERETARO': 110},
+    'HIDALGO': {'CDMX': 90, 'JILOTEPEC': 80, 'SLP': 300, 'QUERETARO': 200, 'TAMAULIPAS': 450},
+    'QUERETARO': {'CDMX': 210, 'JILOTEPEC': 110, 'HIDALGO': 200, 'SLP': 200, 'GDL': 350},
+    'MORELOS': {'CDMX': 85},
+    'SLP': {'HIDALGO': 300, 'QUERETARO': 200, 'ZACATECAS': 190, 'MONTERREY': 500, 'TAMAULIPAS': 350},
+    'ZACATECAS': {'SLP': 190, 'GDL': 320, 'MONTERREY': 460},
+    'GDL': {'QUERETARO': 350, 'ZACATECAS': 320},
+    'MONTERREY': {'SLP': 500, 'ZACATECAS': 460, 'TAMAULIPAS': 280},
+    'TAMAULIPAS': {'SLP': 350, 'MONTERREY': 280, 'HIDALGO': 450}
 }
 
 def buscar_solucion_BFS(estado_inicial, solucion):
+    # Implementación de BFS con Costo Uniforme (Dijkstra)
     solucionado = False
     nodos_visitados = []
     nodos_frontera = []
+    
     nodoInicial = Nodo(estado_inicial)
+    nodoInicial.set_costo(0)
     nodos_frontera.append(nodoInicial)
 
-    # Check if solving for same node
+    # Verificar si es el mismo nodo
     if estado_inicial == solucion:
         return nodoInicial
 
-    while not solucionado and len(nodos_frontera) != 0:
+    while len(nodos_frontera) != 0:
+        # Ordenar la frontera por el costo acumulado (Comportamiento de Cola de Prioridad)
+        nodos_frontera.sort(key=lambda x: x.costo)
         nodo = nodos_frontera.pop(0)
         nodos_visitados.append(nodo)
         
+        # Si llegamos al nodo objetivo, retornamos
+        if nodo.get_datos() == solucion:
+            return nodo
+            
         dato_nodo = nodo.get_datos()
         
         if dato_nodo in conexiones:
             hijos_datos = conexiones[dato_nodo]
         else:
-            hijos_datos = []
+            hijos_datos = {}
             
-        for un_hijo in hijos_datos:
+        for un_hijo, peso in hijos_datos.items():
             hijo = Nodo(un_hijo, padre=nodo)
+            costo_acumulado = nodo.costo + peso
+            hijo.set_costo(costo_acumulado)
             
-            # Verify if not visited
-            # Optimize: check if already in list to avoid duplicates
-            if not hijo.en_lista(nodos_visitados) and not hijo.en_lista(nodos_frontera):
-                if un_hijo == solucion:
-                    solucionado = True
-                    return hijo
-                nodos_frontera.append(hijo)
+            # Verificar si ya lo visitamos
+            if not hijo.en_lista(nodos_visitados):
+                agregado = False
+                # Si ya está en la frontera, actualizar con ruta mas corta si aplica
+                for n in nodos_frontera:
+                    if n.get_datos() == un_hijo:
+                        if hijo.costo < n.costo:
+                            n.set_costo(hijo.costo)
+                            n.padre = nodo
+                        agregado = True
+                        break
+                
+                if not agregado:
+                    nodos_frontera.append(hijo)
                 
     return None
 
@@ -53,17 +71,19 @@ if __name__ == "__main__":
     estado_inicial = 'CDMX'
     solucion = 'MONTERREY'
     
-    print(f"Buscando solucion para ir de {estado_inicial} a {solucion}...")
+    print(f"Buscando solucion para ir de {estado_inicial} a {solucion} con pesos...")
     nodo_solucion = buscar_solucion_BFS(estado_inicial, solucion)
 
     if nodo_solucion:
         resultado = []
         nodo = nodo_solucion
+        coste_total = nodo.costo
         while nodo is not None: 
             resultado.append(nodo.get_datos())
             nodo = nodo.get_padre()
         resultado.reverse()
         print("Ruta encontrada:")
         print(" -> ".join(resultado))
+        print(f"Costo Total: {coste_total}")
     else:
         print("No se encontró solución.")
