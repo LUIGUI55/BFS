@@ -43,7 +43,10 @@
                 </select>
             </div>
 
-            <button type="submit" class="btn-primary">Buscar Ruta</button>
+            <div style="display: flex; gap: 10px; margin-top: 1rem;">
+                <button type="submit" class="btn-primary" style="margin-top: 0;">Buscar Ruta</button>
+                <button type="button" id="clearBtnFlask" class="btn-primary" style="margin-top: 0; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); flex: 0.5; transition: all 0.3s ease;">Limpiar</button>
+            </div>
         </form>
 
         <div id="resultContainer" class="result-container hidden">
@@ -57,6 +60,14 @@
     </main>
 
     <script>
+        document.getElementById('clearBtnFlask').addEventListener('click', () => {
+            document.getElementById('origen').selectedIndex = 0;
+            document.getElementById('destino').selectedIndex = 0;
+            document.getElementById('resultContainer').classList.add('hidden');
+            document.getElementById('errorContainer').classList.add('hidden');
+            document.getElementById('pathResult').innerHTML = '';
+        });
+
         document.getElementById('bfsForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
